@@ -264,9 +264,9 @@ struct ExtendedUnsignedIntImpl<ET, true> {
   }
 
   constexpr void ArithmeticShiftRight(int cnt) {
+    if (cnt == 0) return;
     if (GetHighestBit()) {
       FlipBits();
-      AddOne();
       ShiftRight(cnt);
       FlipBits();
     } else {
@@ -275,6 +275,7 @@ struct ExtendedUnsignedIntImpl<ET, true> {
   }
 
   constexpr void ShiftRight(int cnt) {
+    if (cnt == 0) return;
     if (cnt >= bitsize) {
       low_ = hi_ = 0;
     } else if (cnt >= half_bitsize) {
@@ -290,6 +291,7 @@ struct ExtendedUnsignedIntImpl<ET, true> {
   }
 
   constexpr void ShiftLeft(int cnt) {
+    if (cnt == 0) return;
     if (cnt >= bitsize) {
       low_ = hi_ = 0;
     } else if (cnt >= half_bitsize) {
@@ -1338,9 +1340,9 @@ struct ExtendedUnsignedIntImpl<ET, false> {
   }
 
   constexpr void ArithmeticShiftRight(int cnt) {
+    if (cnt == 0) return;
     if (GetHighestBit()) {
       FlipBits();
-      AddOne();
       ShiftRight(cnt);
       FlipBits();
     } else {
@@ -1349,6 +1351,7 @@ struct ExtendedUnsignedIntImpl<ET, false> {
   }
 
   constexpr void ShiftRight(int cnt) {
+    if (cnt == 0) return;
     if (cnt >= bitsize) {
       MakeZeroBits();
     } else if (cnt >= half_bitsize) {
@@ -1364,6 +1367,7 @@ struct ExtendedUnsignedIntImpl<ET, false> {
   }
 
   constexpr void ShiftLeft(int cnt) {
+    if (cnt == 0) return;
     if (cnt >= bitsize) {
       MakeZeroBits();
     } else if (cnt >= half_bitsize) {
@@ -1665,7 +1669,7 @@ struct ExtendedUnsignedIntImpl<ET, false> {
 
   constexpr ET hi() const { return hi_; }
 
-  constexpr int sign() const { return low_.IsZero() || hi_.IsZero() ? 1 : 0; }
+  constexpr int sign() const { return IsZero() ? 0 : 1; }
 
   constexpr int CompareTo(const ExtendedUnsignedIntImpl& other) const {
     int t = hi_.CompareTo(other.hi_);
@@ -1675,9 +1679,7 @@ struct ExtendedUnsignedIntImpl<ET, false> {
     return low_.CompareTo(other.low_);
   }
 
-  constexpr int IntSign() const {
-    return low_.IsZero() || hi_.IsZero() ? 1 : 0;
-  }
+  constexpr int IntSign() const { return IsZero() ? 0 : 1; }
 
   constexpr int IsZero() const { return low_.IsZero() && hi_.IsZero(); }
 
