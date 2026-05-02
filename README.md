@@ -55,22 +55,23 @@ int main() {
   PE_INIT(maxp = 2000000, cal_phi = 1, cal_mu = 1);
 
   // plist[i] is the (i+1)-th prime; pcnt is the number of primes <= maxp.
-  std::cout << pcnt << std::endl;          // 148933
-  std::cout << PrimeS0<int64>(1000)[1000]; // count of primes <= 1000: 168
+  std::cout << pcnt << std::endl;  // 148933
+  std::cout << PrimeS0<int64>(1000)[1000]
+            << std::endl;  // count of primes <= 1000: 168
 
   // Number theory
-  std::cout << Factorize(360) << std::endl;         // 2^3 * 3^2 * 5
-  std::cout << CalPhi(36) << std::endl;             // 12
-  std::cout << Gcd(24, 36, 52) << std::endl;        // 4
+  std::cout << Factorize(360) << std::endl;   // 2^3 * 3^2 * 5
+  std::cout << CalPhi(36) << std::endl;       // 12
+  std::cout << Gcd(24, 36, 52) << std::endl;  // 4
 
   // Modular arithmetic
   const int64 mod = 1000000007;
-  std::cout << PowerMod(2, 100, mod) << std::endl;  // 2^100 mod p
-  std::cout << FactModer(mod).Cal(10000) << std::endl; // 10000! mod p
+  std::cout << PowerMod(2, 100, mod) << std::endl;      // 2^100 mod p
+  std::cout << FactModer(mod).Cal(10000) << std::endl;  // 10000! mod p
 
   // Polynomial multiplication (mod p)
   std::vector<int64> a = {1, 2, 3}, b = {4, 5, 6};
-  std::cout << PolyMul(a, b, mod) << std::endl;    // {4,13,28,27,18}
+  std::cout << PolyMul(a, b, mod) << std::endl;  // {4,13,28,27,18}
 
   return 0;
 }
