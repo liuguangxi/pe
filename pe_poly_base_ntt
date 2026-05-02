@@ -7,6 +7,9 @@
 
 namespace pe {
 namespace ntt_base {
+// Bit-reversal permutation: reorders data[0..n-1] so that element i moves to
+// the position obtained by reversing the binary representation of i. This is
+// the initial reordering step required by the Cooley-Tukey NTT algorithm.
 template <typename T>
 SL REQUIRES((is_builtin_integer_v<T>)) RETURN(void)
     NttTrans(T* data, const int64 n) {
@@ -28,14 +31,17 @@ namespace ntt32 {
 #define HAS_POLY_MUL_NTT32 1
 
 struct NttMod32 {
-  // mod = r * 2 ^ k + 1
-  // mod is prime
+  // mod = r * 2^k + 1, a prime. g is a primitive root mod p.
   const uint32 mod;
   const uint32 r;
   const int k;
   const uint32 g;
 
+  // omg[i] = g^((mod-1)/2^i) mod p — the primitive 2^i-th root of unity mod p,
+  // used as the twiddle factor for NTT butterfly stages of size 2^i.
   uint32 omg[32];
+  // pre_omg[i], when non-null, holds the first 2^i consecutive powers of omg[i]
+  // (i.e., 1, omg[i], omg[i]^2, ...) for O(1) twiddle factor lookup.
   mutable uint32* pre_omg[32];
 
   NttMod32(uint32 mod, uint32 r, int k, uint32 g) : mod(mod), r(r), k(k), g(g) {
@@ -111,6 +117,7 @@ SL REQUIRES((is_builtin_integer_v<T>)) RETURN(void)
   for (int64 h = 2; h <= n; h <<= 1) {
     const uint32* pomg = moder.pre_omg[++id];
     if (pomg != nullptr) {
+      // Fast path: use precomputed twiddle factor table for O(1) lookup.
       for (int64 j = 0; j < n; j += h) {
         const uint32* omg = pomg;
         const int64 half_h = h >> 1;
@@ -123,6 +130,7 @@ SL REQUIRES((is_builtin_integer_v<T>)) RETURN(void)
         }
       }
     } else {
+      // Slow path: compute twiddle factors on the fly (InitPreOmg not called).
       for (int64 j = 0; j < n; j += h) {
         uint64 omgn = 1;
         const int64 half_h = h >> 1;
@@ -149,6 +157,8 @@ template <typename T, uint32 mod>
 SL std::vector<uint32> RunNtt(const NttMod32& moder, const T* X, int64 n,
                               const T* Y, int64 m, int64 target_mod) {
   const int64 aligned_size = BitCeil(n + m - 1);
+  // When target_mod <= NTT mod, coefficients already fit in [0, mod); no
+  // pre-reduction step is needed before loading into the NTT buffer.
   const bool skip_mod = target_mod > 0 && static_cast<uint64>(target_mod) <=
                                               static_cast<uint64>(mod);
   std::vector<uint32> XX(aligned_size);
@@ -459,15 +469,18 @@ SL REQUIRES((is_builtin_integer_v<T> || is_extended_integer_v<T>))
 }
 
 namespace internal {
-// The medium version uses two modulus.
+// The medium version uses two moduli and reconstructs via Garner's algorithm.
 struct NttRunnerMedium {
  private:
   static constexpr uint64 M1 = ntt_mods[1];
   static constexpr uint64 M2 = ntt_mods[2];
+  // M2^(-1) mod M1, used in Garner's two-prime CRT step.
   static constexpr uint64 INV_M2__M1 = 2594876085;
 
   using Self = NttRunnerMedium;
 
+  // Garner's algorithm: given a ≡ v (mod M1) and b ≡ v (mod M2), recover v.
+  // v = b + M2 * ((a - b) * INV_M2__M1 mod M1)
   template <typename T>
   SL T CombineMod(uint64 a, uint64 b, int64 mod) {
     const uint64 x = a >= b ? a - b : a + Self::M1 - b;
@@ -573,6 +586,10 @@ SL REQUIRES((is_builtin_integer_v<T> || is_extended_integer_v<T>))
 }
 
 namespace internal {
+// When 1, uses direct CRT via int128: v = sum_i (v mod Mi) * (M/Mi) *
+// (M/Mi)^{-1} mod M where M = M1*M2*M3. When 0, uses Garner's algorithm
+// (three-prime mixed radix), which avoids 128-bit multiplication and is
+// compatible with no-int128 builds.
 #define NTT32_DIRECT_INT128_IMPLEMENTATION 0
 
 struct NttRunnerLarge {
@@ -584,6 +601,7 @@ struct NttRunnerLarge {
   static constexpr uint64 M12 = M1 * M2;
   static constexpr uint64 M13 = M1 * M3;
   static constexpr uint64 M23 = M2 * M3;
+  // CRT basis coefficients: (M/Mi)^{-1} mod Mi
   static constexpr uint64 INV_M12__M3 = 2576980436;
   static constexpr uint64 INV_M13__M2 = 1163220197;
   static constexpr uint64 INV_M23__M1 = 3373338954;
@@ -593,6 +611,9 @@ struct NttRunnerLarge {
   static constexpr uint128 M12M = static_cast<uint128>(INV_M12__M3) * M12;
   static constexpr uint128 M123 = static_cast<uint128>(M1) * M2 * M3;
 #endif
+  // Garner constants for three-prime reconstruction (mod M1, M2, M3):
+  //   INV_M3__M2  = M3^{-1} mod M2
+  //   INV_M1__M2M3 = M1^{-1} mod (M2*M3)
   static constexpr uint64 INV_M3__M2 = 13;
 
   static constexpr uint64 M2M3 = M2 * M3;
@@ -739,6 +760,12 @@ struct NttRunnerEnormous {
   static constexpr uint64 M3 = ntt_mods[3];
   static constexpr uint64 M4 = ntt_mods[4];
 
+  // Garner constants for four-prime reconstruction:
+  //   Stage 1: pair (M1,M2) and pair (M3,M4) independently
+  //   Stage 2: combine the two pair results
+  //   INV_M2__M1   = M2^{-1} mod M1
+  //   INV_M4__M3   = M4^{-1} mod M3
+  //   INV_M3M4__M1M2 = (M3*M4)^{-1} mod (M1*M2)
   static constexpr uint64 INV_M2__M1 = 2594876085;
   static constexpr uint64 INV_M4__M3 = 460175071;
 
@@ -936,14 +963,15 @@ namespace ntt64 {
 #define HAS_POLY_MUL_NTT64 1
 
 struct NttMod64 {
-  // mod = r * 2 ^ k + 1
-  // mod is prime
+  // mod = r * 2^k + 1, a prime. g is a primitive root mod p.
   const uint64 mod;
   const uint32 r;
   const int k;
   const uint32 g;
 
+  // omg[i] = g^((mod-1)/2^i) mod p — primitive 2^i-th root of unity mod p.
   uint64 omg[64];
+  // pre_omg[i], when non-null, holds 2^i consecutive powers of omg[i].
   mutable uint64* pre_omg[64];
 
   NttMod64(uint64 mod, uint32 r, int k, uint32 g) : mod(mod), r(r), k(k), g(g) {
@@ -986,6 +1014,9 @@ struct NttMod64 {
   }
 };
 
+// 64-bit NTT-friendly primes (same format as ntt32 above):
+//   1945555039024054273: 27 * 2^56 + 1, primitive root 5
+//    180143985094819841:  5 * 2^55 + 1, primitive root 6
 constexpr uint64 ntt_mods[] = {0, 1945555039024054273, 180143985094819841};
 
 static const NttMod64 ntt_mod_1(ntt_mods[1], 27, 56, 5);
@@ -1007,6 +1038,7 @@ SL REQUIRES((is_builtin_integer_v<T>)) RETURN(void)
   for (int64 h = 2; h <= n; h <<= 1) {
     const uint64* pomg = moder.pre_omg[++id];
     if (pomg != nullptr) {
+      // Fast path: precomputed twiddle table available.
       for (int64 j = 0; j < n; j += h) {
         const uint64* omg = pomg;
         const int64 half_h = h >> 1;
@@ -1024,6 +1056,7 @@ SL REQUIRES((is_builtin_integer_v<T>)) RETURN(void)
         }
       }
     } else {
+      // Slow path: compute twiddle factors on the fly.
       for (int64 j = 0; j < n; j += h) {
         uint64 omgn = 1;
         const int64 half_h = h >> 1;
@@ -1364,10 +1397,12 @@ struct NttRunnerLarge {
  private:
   static constexpr uint64 M1 = ntt_mods[1];
   static constexpr uint64 M2 = ntt_mods[2];
+  // M2^{-1} mod M1, used in two-prime Garner CRT reconstruction.
   static constexpr uint64 INV_M2__M1 = 714693687804754632;
 
   using Self = NttRunnerLarge;
 
+  // Garner's algorithm: v = b + M2 * ((a - b) * INV_M2__M1 mod M1)
   template <typename T>
   SL T CombineMod(uint64 a, uint64 b, int64 mod) {
     const uint64 x = a >= b ? a - b : Self::M1 - b + a;
