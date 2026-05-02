@@ -276,4 +276,78 @@ SL void FindRecurrenceTest() {
                              100, mod, 1) == 251310489);
 }
 PE_REGISTER_TEST(&FindRecurrenceTest, "FindRecurrenceTest", SMALL);
+
+SL void InitCombTest() {
+  const int64 mod = 1000000007;
+  const int MAXN = 30;
+  int64 comb[MAXN + 1][MAXN + 1] = {};
+  InitComb(comb, MAXN, mod);
+
+  // Pascal's triangle identity
+  for (int n = 0; n <= MAXN; ++n) {
+    assert(comb[n][0] == 1 % mod);
+    assert(comb[n][n] == 1 % mod);
+    for (int k = 1; k < n; ++k) {
+      assert(comb[n][k] == (comb[n - 1][k - 1] + comb[n - 1][k]) % mod);
+    }
+  }
+
+  // Known values
+  assert(comb[5][2] == 10);
+  assert(comb[10][5] == 252);
+  assert(comb[20][10] == 184756);
+}
+
+PE_REGISTER_TEST(&InitCombTest, "InitCombTest", SMALL);
+
+SL void InitSeqProd2Test() {
+  const int64 mod = 1000000007;
+  const int n = 100;
+  std::vector<int64> fac(n + 1), ifac(n + 1);
+  InitSeqProd2<int64>(std::data(fac), std::data(ifac), int64(1), int64(n),
+                      mod);
+
+  // fac[0]=1, fac[k]=k! mod p
+  assert(fac[0] == 1);
+  int64 expected = 1;
+  for (int i = 1; i <= n; ++i) {
+    expected = expected * i % mod;
+    assert(fac[i] == expected);
+  }
+
+  // ifac[k] is the modular inverse of fac[k]
+  assert(ifac[0] == 1);
+  for (int i = 1; i <= n; ++i) {
+    assert(fac[i] * ifac[i] % mod == 1);
+  }
+}
+
+PE_REGISTER_TEST(&InitSeqProd2Test, "InitSeqProd2Test", SMALL);
+
+SL void LinearRecurrenceSumTest() {
+  const int64 mod = 1000000007;
+  // Fibonacci {1,1,2,3,5,...}: char poly for x^2 - x - 1 (mod p) is
+  // {mod-1, mod-1, 1}
+  std::vector<int64> char_poly = {mod - 1, mod - 1, 1};
+  std::vector<int64> terms = {1, 1};
+
+  // f10 = 89
+  assert(LinearRecurrenceValueAt(char_poly, terms, 10, mod) == 89);
+
+  // Sum f0..f10 = 1+1+2+3+5+8+13+21+34+55+89 = 232
+  assert(LinearRecurrenceSumAt(char_poly, terms, 10, mod) == 232);
+
+  // Edge cases inside the initial terms
+  assert(LinearRecurrenceSumAt(char_poly, terms, 0, mod) == 1);
+  assert(LinearRecurrenceSumAt(char_poly, terms, 1, mod) == 2);
+
+  // Identity for this sequence: sum(f0..fn) = f(n+2) - 1
+  for (int n = 2; n <= 20; ++n) {
+    int64 f_n2 = LinearRecurrenceValueAt(char_poly, terms, n + 2, mod);
+    int64 sum_n = LinearRecurrenceSumAt(char_poly, terms, n, mod);
+    assert(sum_n == (f_n2 - 1 + mod) % mod);
+  }
+}
+
+PE_REGISTER_TEST(&LinearRecurrenceSumTest, "LinearRecurrenceSumTest", SMALL);
 }  // namespace algo_test

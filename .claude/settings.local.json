@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"\\\\\\\\[0\\\\\\\\]\\\\|out_of_range\\\\|assert.*index\\\\|PE_ASSERT.*<\\\\|PE_ASSERT.*>\\\\|PE_ASSERT.*size\\\\|resize\\(0\" \"D:/hope/usr/include/pe/pe_nt\")",
+      "Bash(grep -E \"^pe_.*\\\\.h$\")"
+    ]
+  }
+}

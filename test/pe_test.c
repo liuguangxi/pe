@@ -24,6 +24,8 @@
 #include "poly_div_test.c"
 #include "poly_mul_test.c"
 #include "fft_test.c"
+#include "fraction_test.c"
+#include "int_algo_test.c"
 #include "prime_pi_sum_test.c"
 #include "tree_test.c"
 #endif
