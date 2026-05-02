@@ -12,14 +12,14 @@
 ## Prerequisites
 
 To use this library, you need a C++ development environment that supports:
-* C++17 or later.
+* C++20 or later.
 * Building `x86_64` targets.
 
 ## Installation
 
 1. **Include the Library:**
    - Place all the library files into a directory of your choice.
-   - Ensure that `#include <pe.hpp>` is by adding the directory to the `CPLUS_INCLUDE_PATH` environment variable.
+   - Ensure that `#include <pe.hpp>` is accessible by adding the directory to the `CPLUS_INCLUDE_PATH` environment variable.
 
 2. **Configure the Library:**
    - Run **[gen_config.py](https://github.com/baihacker/pe/blob/master/gen_config.py)** from the installation directory to generate **[pe_config](https://github.com/baihacker/pe/blob/master/pe_config)**.
@@ -42,11 +42,41 @@ To use this library, you need a C++ development environment that supports:
 
 3. **(Optional) Generate Precompiled Header:**
    - Run `g++ -xc++-header pe.hpp` in the installation directory to create a precompiled header (`pe.hpp.gch`).
-   - You may add additional compiler options if required (e.g., `g++ -xc++-header pe.hpp --std=c++17 -O3 -march=native -fopenmp`).
+   - You may add additional compiler options if required (e.g., `g++ -xc++-header pe.hpp --std=c++20 -O3 -march=native -fopenmp`).
 
 ## Usage
 
-For a quick start, refer to [example.c](https://github.com/baihacker/pe/blob/master/example/example.c).
+```cpp
+#include <pe.hpp>
+using namespace pe;
+
+int main() {
+  // Initialize prime table up to 2,000,000 and related arithmetic functions.
+  PE_INIT(maxp = 2000000, cal_phi = 1, cal_mu = 1);
+
+  // plist[i] is the (i+1)-th prime; pcnt is the number of primes <= maxp.
+  std::cout << pcnt << std::endl;          // 148933
+  std::cout << PrimeS0<int64>(1000)[1000]; // count of primes <= 1000: 168
+
+  // Number theory
+  std::cout << Factorize(360) << std::endl;         // 2^3 * 3^2 * 5
+  std::cout << CalPhi(36) << std::endl;             // 12
+  std::cout << Gcd(24, 36, 52) << std::endl;        // 4
+
+  // Modular arithmetic
+  const int64 mod = 1000000007;
+  std::cout << PowerMod(2, 100, mod) << std::endl;  // 2^100 mod p
+  std::cout << FactModer(mod).Cal(10000) << std::endl; // 10000! mod p
+
+  // Polynomial multiplication (mod p)
+  std::vector<int64> a = {1, 2, 3}, b = {4, 5, 6};
+  std::cout << PolyMul(a, b, mod) << std::endl;    // {4,13,28,27,18}
+
+  return 0;
+}
+```
+
+For a more comprehensive reference, see [example.c](https://github.com/baihacker/pe/blob/master/example/example.c).
 
 ## File List
 
@@ -58,7 +88,7 @@ This list categorizes the library files by their functional modules for easier u
 *   `pe_base`: **Base components**. Includes standard library headers, common macros (e.g., `PE_ASSERT`), type definitions (`int64`, `uint128`), and basic inline functions.
 *   `pe_internal`: **Internal implementation details**. Includes the configuration file (`pe_config`), performs compiler/platform checks, and manages the inclusion of third-party libraries.
 *   `pe_config`: **Centralized configuration file**. Used to configure various features of the PE library, such as enabling third-party libraries (`ENABLE_GMP`), `int128` support, and assertions.
-*   `pe_initializer`: **Library initialization helper**. Provides helper classes and macros (`PE_INIT`) to initialize library settings at program startup, such as prime table generation and parallel environment setup.
+*   `pe_initializer`: **Library initialization helper**. Provides the `PE_INIT` macro to initialize library settings at program startup, such as prime table generation and parallel environment setup.
 *   `pe_type_traits`: **Type trait utilities**. Offers custom type traits for compile-time type introspection.
 *   `pe_time`: **Time utilities**. Provides `TimeDelta` and `TimeRecorder` for timing code execution.
 *   `pe_io`: **I/O operations**. Provides simplified or accelerated I/O methods and macros, such as `ReadInt` and `PromptAnswer`.
@@ -90,7 +120,7 @@ This list categorizes the library files by their functional modules for easier u
 **Algorithms**
 
 *   `pe_algo`: **General algorithms collection**. Contains various algorithms like binary search, combinatorial functions, power sums, and prefix sums of number theory functions.
-*   `pe_int_algo`: **Integer algorithms**. Algorithms for extended and general big integers, such as the Extended Euclidean Algorithm (`ExGcd`) and the Chinese Remainder Theorem (`Crt`).
+*   `pe_int_algo`: **Integer algorithms**. Algorithms for extended and general big integers, such as the Extended Euclidean Algorithm (`ExGcd`), the Chinese Remainder Theorem (`Crt2`, `CrtN`), and continued fractions (`ToContinuedFraction`, `FromContinuedFraction`).
 *   `pe_bit`: **Bit manipulation utilities**. Provides functions for counting leading/trailing zeros (`pe_clzll`, `pe_ctzll`), population count, and determining bit width.
 
 **Number Theory**
@@ -123,11 +153,7 @@ This list categorizes the library files by their functional modules for easier u
 
 *   `pe_geometry`: **Geometric computations**. Supports `Point2D` and `Point3D` objects and their operations.
 *   `pe_memory`: **Memory management**. Provides memory management utilities (Windows only).
-*   `pe_misc`: **Miscellaneous utility functions**. Contains useful functions that don't fit into other categories, such as Gaussian elimination (`GaussianEliminationMod2`).
+*   `pe_misc`: **Miscellaneous utility functions**. Contains useful functions that don't fit into other categories, such as Gaussian elimination over GF(2) (`GaussianEliminationMod2`) and over the reals (`GaussianEliminationSolver`).
 *   `pe_mma`: **Mathematica (MMA) support**. Provides helper methods or classes for generating MMA code, like `FRHelper`.
 *   `pe_rand`: **Random number generation**. Includes random number generation utilities.
 *   `pe_serialization`: **Object serialization**. Provides functionality to serialize objects into sequences of integers.
-
-
-
-
