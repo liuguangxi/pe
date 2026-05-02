@@ -110,6 +110,8 @@ class BigInteger {
     } else {
       int need = 0;
       for (T t = value; t > 0; ++need) {
+// MSVC and Clang miscompile a single >>= 32 on types wider than 64 bits;
+// two 16-bit shifts are always safe.
 #if defined(COMPILER_MSVC) || defined(COMPILER_CLANG)
         t >>= 16;
         t >>= 16;
@@ -1429,7 +1431,7 @@ class BigInteger {
   friend inline REQUIRES(
       (is_builtin_integer_v<T> &&
        !std::is_same<typename std::remove_cvref<T>::type, BigInteger>::value))
-      RETURN(BigInteger) operator*(const BigInteger & l, T r) {
+      RETURN(BigInteger) operator*(const BigInteger& l, T r) {
     if (r == 0 || l.IsZero()) return 0;
 
     using UnsignedT = pe_make_unsigned_t<T>;
@@ -1446,7 +1448,7 @@ class BigInteger {
   friend inline REQUIRES(
       (is_builtin_integer_v<T> &&
        !std::is_same<typename std::remove_cvref<T>::type, BigInteger>::value))
-      RETURN(BigInteger) operator*(T l, const BigInteger & r) {
+      RETURN(BigInteger) operator*(T l, const BigInteger& r) {
     return r * l;
   }
 
@@ -1455,10 +1457,10 @@ class BigInteger {
   }
 
   template <typename T>
-  friend inline REQUIRES((
-      is_builtin_integer_v<T> &&
-      !std::is_same<typename std::remove_cvref<T>::type, BigInteger>::value &&
-      sizeof(T) <= 8)) RETURN(BigInteger) operator/(const BigInteger & l, T r) {
+  friend inline REQUIRES(
+      (is_builtin_integer_v<T> &&
+       !std::is_same<typename std::remove_cvref<T>::type, BigInteger>::value &&
+       sizeof(T) <= 8)) RETURN(BigInteger) operator/(const BigInteger& l, T r) {
     T remain;
     return Divide(l, r, remain);
   }
@@ -1615,10 +1617,10 @@ class BigInteger {
   }
 
   template <typename T>
-  friend inline REQUIRES((
-      is_builtin_integer_v<T> &&
-      !std::is_same<typename std::remove_cvref<T>::type, BigInteger>::value &&
-      sizeof(T) <= 8)) RETURN(BigInteger) operator%(const BigInteger & l, T r) {
+  friend inline REQUIRES(
+      (is_builtin_integer_v<T> &&
+       !std::is_same<typename std::remove_cvref<T>::type, BigInteger>::value &&
+       sizeof(T) <= 8)) RETURN(BigInteger) operator%(const BigInteger& l, T r) {
     BigInteger u;
     T remain;
     Divide(l, r, remain);
@@ -1689,7 +1691,7 @@ class BigInteger {
   friend inline REQUIRES(
       (is_builtin_integer_v<T> &&
        !std::is_same<typename std::remove_cvref<T>::type, BigInteger>::value))
-      RETURN(BigInteger) operator<<(const BigInteger & l, T n) {
+      RETURN(BigInteger) operator<<(const BigInteger& l, T n) {
     if (l.sign() == 0) {
       return 0;
     }
@@ -1715,7 +1717,7 @@ class BigInteger {
   friend inline REQUIRES(
       (is_builtin_integer_v<T> &&
        !std::is_same<typename std::remove_cvref<T>::type, BigInteger>::value))
-      RETURN(BigInteger) operator>>(const BigInteger & l, T n) {
+      RETURN(BigInteger) operator>>(const BigInteger& l, T n) {
     if (l.sign() == 0) {
       return 0;
     }

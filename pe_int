@@ -602,6 +602,8 @@ SL std::vector<T> AbsDivide(const std::vector<T>& l, const std::vector<T>& r,
       continue;
     }
 
+    // Each element of remain/r is a single binary digit (0 or 1); base = 2.
+    // Borrowing from the next position adds 2 to the current digit.
     int borrow = 0;
     int i = end, j = 0;
     for (; j < r_size; ++i, ++j) {

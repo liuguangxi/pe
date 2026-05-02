@@ -23,7 +23,7 @@ SL T ReadInt() {
   if (c == '-') {
     s = 0;
   } else if (f.dig[c]) {
-    v = c ^ 48;
+    v = c ^ 48;  // '0' == 48, so c ^ 48 converts ASCII digit to its value
   }
   for (; f.dig[c = getchar()]; v = v * 10 + (c ^ 48)) {
     ;

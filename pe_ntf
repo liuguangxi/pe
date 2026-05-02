@@ -38,6 +38,8 @@ struct SFCounter {
     if (n <= pivot_) return pre_[n];
     auto where = mem_.find(n);
     if (where != std::end(mem_)) return where->second;
+    // Uses the identity n = sum_{d=1}^{sqrt(n)} Q(floor(n/d^2)), rearranged as
+    // Q(n) = n - sum_{d>=2} Q(floor(n/d^2)).
     int64 ret = n;
     for (int64 i = 2;; ++i) {
       const int64 i2 = i * i;
@@ -85,6 +87,9 @@ struct MuSummer {
     auto where = mem_.find(n);
     if (where != std::end(mem_)) return where->second;
 
+    // Uses sum_{k=1}^{n} M(floor(n/k)) = 1 (Dirichlet convolution mu*1 =
+    // [n=1]), rearranged as M(n) = 1 - sum_{k=2}^{n} M(floor(n/k)).
+    // Floor-division grouping reduces iterations to O(sqrt(n)).
     T ret = 1;
     for (int64 i = 2; i <= n;) {
       const int64 v = n / i;
@@ -134,6 +139,7 @@ struct MuPhiSummer {
     auto where = mem_sum_mu_.find(n);
     if (where != std::end(mem_sum_mu_)) return where->second;
 
+    // M(n) = 1 - sum_{k=2}^{n} M(floor(n/k)); see MuSummer::Cal for derivation.
     T ret = 1;
     for (int64 i = 2; i <= n;) {
       const int64 v = n / i;

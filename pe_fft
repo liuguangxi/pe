@@ -114,6 +114,10 @@ SL void PolyMulFftSmallImpl(uint64* x, uint64* y, uint64* z, const int n,
 
 SL void PolyMulFftImpl(uint64* x, uint64* y, uint64* z, const int n,
                        int64 mod) {
+  // Split each coefficient as v = (v % m) + m*(v / m) where m =
+  // ceil(sqrt(mod)). This keeps values below ~2^26 so their products fit
+  // exactly in double (53-bit mantissa). Four cross-products are recovered with
+  // two packed FFTs.
   int64 m = static_cast<int64>(std::sqrt(mod));
   while (m * m < mod) ++m;
   std::vector<Complex> a(n), b(n);

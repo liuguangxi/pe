@@ -176,6 +176,7 @@ SL constexpr int32 MulModInt32(int32 a, int32 b, int32 mod) {
 // Gnu assembly language implementation
 #if defined(COMPILER_GNU) && PE_X86_64
 SL uint64 MulModUint64GnuAsm(uint64 a, uint64 b, uint64 mod) {
+  // 32-bit mull/divl is faster when mod fits in 32 bits.
   if (!(mod >> 32)) {
     uint32 q, r;
     __asm__(
@@ -198,6 +199,7 @@ SL uint64 MulModUint64GnuAsm(uint64 a, uint64 b, uint64 mod) {
 }
 
 SL int64 MulModInt64GnuAsm(int64 a, int64 b, int64 mod) {
+  // 32-bit imull/idivl is faster; requires mod < 2^31 to fit in signed int32.
   if (!(static_cast<uint64>(mod) >> 31)) {
     int32 q, r;
     __asm__(
@@ -1021,13 +1023,13 @@ struct NModNumber {
 
   template <typename T>
   friend REQUIRES((is_builtin_integer_v<T>))
-      RETURN(NModNumber) operator+(const NModNumber & x, T y) {
+      RETURN(NModNumber) operator+(const NModNumber& x, T y) {
     return x + NModNumber(y);
   }
 
   template <typename T>
   friend REQUIRES((is_builtin_integer_v<T>))
-      RETURN(NModNumber) operator+(T x, const NModNumber & y) {
+      RETURN(NModNumber) operator+(T x, const NModNumber& y) {
     return NModNumber(x) + y;
   }
 
@@ -1211,13 +1213,13 @@ struct NModNumberM {
 
   template <typename T>
   friend REQUIRES((is_builtin_integer_v<T>))
-      RETURN(NModNumberM) operator+(const NModNumberM & x, T y) {
+      RETURN(NModNumberM) operator+(const NModNumberM& x, T y) {
     return x + NModNumberM(y, x.mc);
   }
 
   template <typename T>
   friend REQUIRES((is_builtin_integer_v<T>))
-      RETURN(NModNumberM) operator+(T x, const NModNumberM & y) {
+      RETURN(NModNumberM) operator+(T x, const NModNumberM& y) {
     return NModNumberM(x, y.mc) + y;
   }
 
@@ -1228,13 +1230,13 @@ struct NModNumberM {
 
   template <typename T>
   friend REQUIRES((is_builtin_integer_v<T>))
-      RETURN(NModNumberM) operator-(const NModNumberM & x, T y) {
+      RETURN(NModNumberM) operator-(const NModNumberM& x, T y) {
     return x - NModNumberM(y, x.mc);
   }
 
   template <typename T>
   friend REQUIRES((is_builtin_integer_v<T>))
-      RETURN(NModNumberM) operator-(T x, const NModNumberM & y) {
+      RETURN(NModNumberM) operator-(T x, const NModNumberM& y) {
     return NModNumberM(x, y.mc) - y;
   }
 
@@ -1245,13 +1247,13 @@ struct NModNumberM {
 
   template <typename T>
   friend REQUIRES((is_builtin_integer_v<T>))
-      RETURN(NModNumberM) operator*(const NModNumberM & x, T y) {
+      RETURN(NModNumberM) operator*(const NModNumberM& x, T y) {
     return x * NModNumberM(y, x.mc);
   }
 
   template <typename T>
   friend REQUIRES((is_builtin_integer_v<T>))
-      RETURN(NModNumberM) operator*(T x, const NModNumberM & y) {
+      RETURN(NModNumberM) operator*(T x, const NModNumberM& y) {
     return NModNumberM(x, y.mc) * y;
   }
 
