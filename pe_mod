@@ -1434,60 +1434,60 @@ SL REQUIRES((is_general_integer_v<T> && IsNModNumberV<TM>)) RETURN(T)
 }
 
 #if PE_HAS_CPP20
-#define PE_MOD_ARTHMETIC_OPERATION_IMPL(type) \
-  v + static_cast<type>(1);                   \
-  v - static_cast<type>(1);                   \
-  v* static_cast<type>(1);                    \
-  static_cast<type>(1) + v;                   \
-  static_cast<type>(1) - v;                   \
+#define PE_MOD_ARITHMETIC_OPERATION_IMPL(type) \
+  v + static_cast<type>(1);                    \
+  v - static_cast<type>(1);                    \
+  v* static_cast<type>(1);                     \
+  static_cast<type>(1) + v;                    \
+  static_cast<type>(1) - v;                    \
   static_cast<type>(1) * v
 
-#define PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(type) \
-  v += static_cast<type>(1);                       \
-  v -= static_cast<type>(1);                       \
+#define PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(type) \
+  v += static_cast<type>(1);                        \
+  v -= static_cast<type>(1);                        \
   v *= static_cast<type>(1)
 
 template <class T>
 concept PeModNumber = requires(T v) {
   requires static_cast<bool>(IsNModNumberV<T>);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(char);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(unsigned char);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(signed char);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(int);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(unsigned int);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(signed int);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(short int);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(unsigned short int);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(long int);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(signed long int);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(unsigned long int);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(long long int);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(signed long long int);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(unsigned long long int);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(char);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(unsigned char);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(signed char);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(int);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(unsigned int);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(signed int);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(short int);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(unsigned short int);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(long int);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(signed long int);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(unsigned long int);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(long long int);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(signed long long int);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(unsigned long long int);
 #if PE_HAS_INT128
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(int128);
-  PE_MOD_ARTHMETIC_OPERATION_IMPL(uint128);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(int128);
+  PE_MOD_ARITHMETIC_OPERATION_IMPL(uint128);
 #endif
   v + v;
   v - v;
   v * v;
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(char);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(unsigned char);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(signed char);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(int);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(unsigned int);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(signed int);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(short int);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(unsigned short int);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(long int);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(signed long int);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(unsigned long int);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(long long int);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(signed long long int);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(unsigned long long int);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(char);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(unsigned char);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(signed char);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(int);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(unsigned int);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(signed int);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(short int);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(unsigned short int);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(long int);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(signed long int);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(unsigned long int);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(long long int);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(signed long long int);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(unsigned long long int);
 #if PE_HAS_INT128
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(int128);
-  PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL(uint128);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(int128);
+  PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL(uint128);
 #endif
   v += v;
   v -= v;
@@ -1497,8 +1497,8 @@ concept PeModNumber = requires(T v) {
   v++;
   v--;
 };
-#undef PE_MOD_ARTHMETIC_OPERATION_IMPL
-#undef PE_MOD_SELF_ARTHMETIC_OPERATION_IMPL
+#undef PE_MOD_ARITHMETIC_OPERATION_IMPL
+#undef PE_MOD_SELF_ARITHMETIC_OPERATION_IMPL
 
 static_assert(PeModNumber<NModCC64<1000000007>>);
 static_assert(PeModNumber<NModTL64<>>);
