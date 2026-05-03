@@ -77,6 +77,10 @@ int main() {
   std::cout << XRange(1, 1000000).Filter(IsPrime).Count()
             << std::endl;  // count of primes <= 1000000: 78498
   std::cout << XRange(1, 100).Prod<uint1024e>() << std::endl;  // 100!
+  Mpf::SetDefaultPrec(2000);
+  std::cout
+      << XRange(1, 1000).Map<Mpf>([](int a) { return Mpf(1) / a; }).Sum<Mpf>()
+      << std::endl;  // sum(1/i, {i,1,1000}): 7.4854708605503449127
 
   // Sequence
   Sequence<int64> a;
