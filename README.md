@@ -70,8 +70,21 @@ int main() {
   std::cout << FactModer(mod).Cal(10000) << std::endl;  // 10000! mod p
 
   // Polynomial multiplication (mod p)
-  std::vector<int64> a = {1, 2, 3}, b = {4, 5, 6};
-  std::cout << PolyMul(a, b, mod) << std::endl;  // {4,13,28,27,18}
+  std::cout << PolyMul<int64>({1, 2, 3}, {4, 5, 6}, mod)
+            << std::endl;  // {4,13,28,27,18}
+
+  // Range
+  std::cout << XRange(1, 1000000).Filter(IsPrime).Count()
+            << std::endl;  // count of primes <= 1000000: 78498
+  std::cout << XRange(1, 100).Prod<uint1024e>() << std::endl;  // 100!
+
+  // Sequence
+  Sequence<int64> a;
+  std::cout << (a[1] + a[2]).Generate({0, 1}, 20)
+            << std::endl;  // First 20 fibonacci numbers.
+  std::cout << *FindLinearRecurrenceValues({0, 1, 1, 2, 3}, 20, mod)
+            << std::endl;  // Automatically find the linear recurence and output
+                           // the first 20 elements.
 
   return 0;
 }
