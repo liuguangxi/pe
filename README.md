@@ -83,8 +83,8 @@ int main() {
   std::cout << (a[1] + a[2]).Generate({0, 1}, 20)
             << std::endl;  // First 20 fibonacci numbers.
   std::cout << *FindLinearRecurrenceValues({0, 1, 1, 2, 3}, 20, mod)
-            << std::endl;  // Automatically find the linear recurence and output
-                           // the first 20 elements.
+            << std::endl;  // Automatically find the linear recurrence and
+                           // output the first 20 elements.
 
   return 0;
 }
