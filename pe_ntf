@@ -1607,7 +1607,10 @@ SL DVA<T> PrimeS0(const int64 n) {
   }
 }
 
-#define PrimePi PrimeS0
+template <typename T, int TN = kDvaOperationThreads>
+SL DVA<T> PrimePi(const int64 n) {
+  return PrimeS0<T, TN>(n);
+}
 
 // Calculates
 // sum([i is prime] i, 1 <= i <= j) for j in [1, 2, 3, ..., n/3, n/2, n]
@@ -1699,7 +1702,10 @@ SL DVA<T> PrimeS1(const int64 n) {
   }
 }
 
-#define PrimeSum PrimeS1
+template <typename T, int TN = kDvaOperationThreads>
+SL DVA<T> PrimeSum(const int64 n) {
+  return PrimeS1<T, TN>(n);
+}
 
 // Calculates
 // sum([i is prime] 1, 1 <= i <= j) for j in [1, 2, 3, ..., n/3, n/2, n].
