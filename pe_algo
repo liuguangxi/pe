@@ -2024,7 +2024,7 @@ struct CarlitzWordsCounter {
 namespace internal {
 // Let P(i, x) = sum(C(i, d) x^d, 0 <= d <= deg)
 //
-// It is assumted that
+// It is assumed that
 // P(order, n) A(n) + P(order-1, n-1) A(n-1) + ... + P(0, n-order) A(n-order)= 0
 //
 // The minimal order for a given deg is automatically determined.
@@ -2100,11 +2100,11 @@ SL std::optional<std::vector<std::vector<int64>>> FindRecurrenceWithDegree(
   int order = rank / (deg + 1);
   std::vector<std::vector<int64>> ret(order + 1, std::vector<int64>(deg + 1));
   // The equation has infinity solution.
-  // The highest degree of P(0, x) is dertermined and the coefficient is set
+  // The highest degree of P(order, x) is determined and the coefficient is set
   // to 1.
-  ret[0][rank % (deg + 1)] = 1;
+  ret[order][rank % (deg + 1)] = 1;
   for (int y = rank - 1; y >= 0; --y) {
-    const int k = order - y / (deg + 1);
+    const int k = y / (deg + 1);
     const int d = y % (deg + 1);
     ret[k][d] = (mod - mat[y][rank]) % mod;
   }
@@ -2124,7 +2124,7 @@ SL int64 RecurrenceValueNext(const std::vector<std::vector<int64>>& recurrence,
     const int64 k = SubMod(Mod(m, mod), Mod(i, mod), mod);
     int64 t = terms[std::size(terms) - i];
     for (int d = 0; d <= deg; ++d) {
-      s = AddMod(s, MulMod(t, recurrence[i][d], mod), mod);
+      s = AddMod(s, MulMod(t, recurrence[order - i][d], mod), mod);
       t = MulMod(t, k, mod);
     }
   }
@@ -2132,7 +2132,7 @@ SL int64 RecurrenceValueNext(const std::vector<std::vector<int64>>& recurrence,
   int64 denom = 0;
   int64 mpow = 1;
   for (int d = 0; d <= deg; ++d) {
-    denom = AddMod(denom, MulMod(mpow, recurrence[0][d], mod), mod);
+    denom = AddMod(denom, MulMod(mpow, recurrence[order][d], mod), mod);
     mpow = MulMod(mpow, m, mod);
   }
 
