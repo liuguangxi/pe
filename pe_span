@@ -483,6 +483,7 @@ using AdaptToSpanTransformT = typename AdaptToSpanTransform<T>::Type;
     return func(AdaptToSpanTransformT<Args&&>(std::forward<Args>(args))...);  \
   }
 
+namespace internal {
 template <typename T>
 struct span_like_impl<Span<T>> : public pe_element_type_traits<T> {
   static constexpr bool value = true;
@@ -493,6 +494,7 @@ struct span_like_impl<CSpan<T>>
     : public pe_element_type_traits<std::add_const_t<T>> {
   static constexpr bool value = true;
 };
+}  // namespace internal
 
 }  // namespace pe
 #endif
