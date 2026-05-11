@@ -7,7 +7,7 @@
 #include "pe_mod"
 
 #if PE_HAS_INT128
-inline int128 operator"" _i128(const char* sv, size_t /*sc*/) {
+inline int128 operator""_i128(const char* sv, size_t /*sc*/) {
   int128 r = 0;
   int s = 1;
   while (*sv) {
@@ -23,7 +23,7 @@ inline int128 operator"" _i128(const char* sv, size_t /*sc*/) {
   return s > 0 ? r : -r;
 }
 
-inline uint128 operator"" _u128(const char* sv, size_t /*sc*/) {
+inline uint128 operator""_u128(const char* sv, size_t /*sc*/) {
   uint128 r = 0;
   while (*sv) {
     int now = *sv++;

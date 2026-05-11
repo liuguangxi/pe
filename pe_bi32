@@ -1774,11 +1774,11 @@ static_assert(PeFraction<Fraction<BigInteger>>);
 }  // namespace pe
 #endif
 
-inline pe::BigInteger operator"" _bi(const char* sv, size_t /*sc*/) {
+inline pe::BigInteger operator""_bi(const char* sv, size_t /*sc*/) {
   return pe::BigInteger(std::string(sv));
 }
 
-inline pe::BigInteger operator"" _bi(unsigned long long v) {
+inline pe::BigInteger operator""_bi(unsigned long long v) {
   return pe::BigInteger(v);
 }
 #endif
