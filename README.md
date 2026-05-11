@@ -88,7 +88,10 @@ int main() {
             << std::endl;  // First 20 fibonacci numbers.
   std::cout << *FindLinearRecurrenceValues({0, 1, 1, 2, 3}, 20, mod)
             << std::endl;  // Automatically find the linear recurrence and
-                           // output the first 20 elements.
+                           // output the first 20 elements. Fobonacci numbers.
+  std::cout << *FindRecurrenceValues({1, 1, 2, 5, 14, 42}, 20, mod, 1)
+            << std::endl;  // Automatically find the recurrence and output the
+                           // first 20 elements. Catalan numbers.
 
   return 0;
 }
