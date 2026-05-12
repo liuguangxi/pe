@@ -134,5 +134,9 @@ struct PeInitializer {
 };
 }  // namespace pe
 
+// Available members (ordered)
+// maxp
+// cal_phi, cal_mu, cal_rad, cal_sigma0, cal_sigma1
+// fft_k, ntt32_k, ntt64_k, default_mod
 #define PE_INIT(...) (pe::PeInitializer{PE_ADD_DOT(__VA_ARGS__)}).Init()
 #endif
