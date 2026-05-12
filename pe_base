@@ -400,7 +400,7 @@ template <typename T>
 SL void InplaceUniqueVector(std::vector<T>& v) {
   if (std::size(v) > 1) {
     std::sort(std::begin(v), std::end(v));
-    v.resize(unique(std::begin(v), std::end(v)) - std::begin(v));
+    v.resize(std::unique(std::begin(v), std::end(v)) - std::begin(v));
   }
 }
 
@@ -408,7 +408,7 @@ template <typename T>
 SL std::vector<T> UniqueVector(std::vector<T> v) {
   if (std::size(v) > 1) {
     std::sort(std::begin(v), std::end(v));
-    v.resize(unique(std::begin(v), std::end(v)) - std::begin(v));
+    v.resize(std::unique(std::begin(v), std::end(v)) - std::begin(v));
   }
   return v;
 }
