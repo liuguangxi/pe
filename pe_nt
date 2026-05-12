@@ -1286,7 +1286,7 @@ SL std::vector<std::pair<int64, int64>> TwoSquaresImpl(
   std::vector<std::pair<int64, int64>> ret;
   TwoSquaresImpl(0, f, 1, 0, ret);
   std::sort(std::begin(ret), std::end(ret));
-  ret.resize(unique(std::begin(ret), std::end(ret)) - std::begin(ret));
+  ret.resize(std::unique(std::begin(ret), std::end(ret)) - std::begin(ret));
   return ret;
 }
 }  // namespace internal
